@@ -370,7 +370,7 @@
         const params = new URLSearchParams(window.location.search);
         const categoryName = params.get('category') || 'class1'; // 默认分类为class1
         // 图片基础URL
-        const baseUrl = 'https://github.com/Xunyu668/UI_STORE_1';
+        const baseUrl = `src/${categoryName}`;
         
         // 显示当前分类名称
         document.getElementById('categoryName').textContent = `当前分类: ${categoryName}`;
@@ -417,4 +417,5 @@
         }
     </script>
 </body>
+
 </html>
