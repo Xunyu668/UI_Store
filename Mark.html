@@ -1217,18 +1217,35 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 获取URL参数（baseUrl已从分组页面传递为相对路径，如"src/class1"）
             const params = new URLSearchParams(window.location.search);
-            currentCategory = params.get('category') || '未知分类';
+            let originalCategory = params.get('category') || '未知分类'; // 保存原始分类名（用于显示）
             currentGroup = params.get('group') || '未知分组';
-            classPrefix = params.get('category') || 'class1'; // 用分类名作为前缀（与分组页面一致）
-            // 关键修改1：直接接收分组页面传递的相对路径baseUrl（如"src/class1"）
-            baseImageUrl = params.get('baseUrl') || `src/${classPrefix}`; // 兜底默认值
             startImageNo = parseInt(params.get('start')) || 1;
             endImageNo = parseInt(params.get('end')) || 50;
-
-            // 显示分类和分组信息
+        
+            // 核心：中文分类名 -> classX 映射逻辑
+            const categoryMap = {
+                '注册登录': 'class1',
+                '编辑检索': 'class2',
+                '属性设置': 'class3', // 修正原文"属性设置 class3"的表述
+                '应用功能': 'class4',
+                '导航': 'class5'
+            };
+        
+            // 1. 根据原始分类名获取对应的class前缀（未匹配到则用默认class1）
+            classPrefix = categoryMap[originalCategory] || 'class1';
+            // 2. 最终显示的分类名（保持中文，如"注册登录"，但路径用class1）
+            currentCategory = originalCategory;
+            // 3. 图片基础路径（强制使用 classX 格式，忽略分组页面传递的baseUrl，避免路径混乱）
+            baseImageUrl = `src/${classPrefix}`;
+        
+            // 显示分类和分组信息（显示中文分类名，用户体验更好）
             document.getElementById('currentCategory').textContent = `当前分类：${currentCategory}`;
             document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}`;
-
+        
+            // 调试日志：查看映射结果（可选，发布时可删除）
+            console.log(`分类映射：${originalCategory} -> ${classPrefix}`);
+            console.log(`图片基础路径：${baseImageUrl}`);
+        
             // 初始化界面状态
             updateUndoButtonState();
             updateAnnotationCount();
@@ -1237,7 +1254,7 @@
             // 初始化
             initInteractionListeners();
             buildImageUrls();
-
+        
             // 禁止后退
             history.pushState(null, null, document.URL);
             window.addEventListener('popstate', () => {
@@ -1248,3 +1265,4 @@
     </script>
 </body>
 </html>
+
