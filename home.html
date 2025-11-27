@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试分类选择</title>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局样式重置与基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --success-color: #4cc9f0;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition-normal: 0.3s ease;
+        }
+
+        /* 页面基础设置 */
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 装饰元素 */
+        .decor-element {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.08);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .decor-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: -5%;
+            animation-delay: 0s;
+        }
+
+        .decor-2 {
+            width: 350px;
+            height: 350px;
+            bottom: 10%;
+            right: -5%;
+            animation-delay: 4s;
+        }
+
+        .decor-3 {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-30px) translateX(15px);
+            }
+        }
+
+        /* 标题容器 */
+        .header-container {
+            text-align: center;
+            margin-bottom: 50px;
+            max-width: 800px;
+            padding: 0 20px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+        }
+
+        .header-container:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.8;
+            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 完成徽章 */
+        .completion-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .completion-badge i {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* 按钮容器样式 */
+        .button-container {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            padding: 0 20px;
+        }
+
+        /* 按钮样式 */
+        .start-btn {
+            padding: 22px 30px;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1.25rem;
+            font-weight: 600;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 按钮渐变背景（hover时显示） */
+        .start-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.05), transparent);
+            transition: 0.6s ease;
+        }
+
+        .start-btn:hover:before {
+            left: 100%;
+        }
+
+        /* 按钮悬停效果 */
+        .start-btn:hover {
+            background: var(--bg-white);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            color: var(--primary-color);
+        }
+
+        /* 按钮点击效果 */
+        .start-btn:active {
+            transform: translateY(1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 按钮图标 */
+        .start-btn .icon {
+            font-size: 1.5rem;
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+            color: var(--primary-color);
+        }
+
+        .start-btn:hover .icon {
+            transform: translateX(8px);
+            opacity: 1;
+        }
+
+        .start-btn .category-name {
+            display: flex;
+            align-items: center;
+        }
+
+        .start-btn .category-name i {
+            margin-right: 12px;
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* 分类标签 */
+        .category-tag {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .start-btn {
+                font-size: 1.1rem;
+                padding: 18px 20px;
+            }
+
+            .header-container {
+                padding: 25px 20px;
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .button-container {
+                gap: 15px;
+            }
+
+            .start-btn .category-name i {
+                margin-right: 8px;
+            }
+
+            .category-tag {
+                display: none;
+            }
+        }
+
+        /* 加载动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-container, .button-container {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .button-container .start-btn {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .button-container .start-btn:nth-child(1) { animation-delay: 0.1s; }
+        .button-container .start-btn:nth-child(2) { animation-delay: 0.2s; }
+        .button-container .start-btn:nth-child(3) { animation-delay: 0.3s; }
+        .button-container .start-btn:nth-child(4) { animation-delay: 0.4s; }
+        .button-container .start-btn:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="decor-element decor-1"></div>
+    <div class="decor-element decor-2"></div>
+    <div class="decor-element decor-3"></div>
+
+    <div class="header-container">
+        <div class="completion-badge">
+            <i class="fas fa-trophy"></i>
+            练习完成
+        </div>
+        <h1>准备开始正式测试</h1>
+        <p class="subtitle">请选择以下测试分类进入对应场景，不同分类包含不同类型的UI交互任务，完成所有分类即可结束测试</p>
+    </div>
+    
+    <!-- 星星拖尾和烟花效果 -->
+    <span class="js-cursor-container"></span>
+    <script src="script/星星拖尾.js"></script>
+    <script src="script/点击烟花.js"></script>
+
+    <!-- 按钮容器 -->
+    <div class="button-container" id="button-container">
+        <!-- 按钮将通过 JavaScript 动态生成 -->
+    </div>
+
+    <script>
+        // 定义 5 个测试分类及对应的跳转页面和图标
+        const testCategories = [
+            { 
+                name: "注册登录", 
+                page: "group1.html", 
+                icon: "fas fa-user-plus",
+                tag: "基础交互"
+            },
+            { 
+                name: "编辑检索", 
+                page: "group2.html", 
+                icon: "fas fa-search",
+                tag: "文本交互"
+            },
+            { 
+                name: "属性设置", 
+                page: "group3.html", 
+                icon: "fas fa-cog",
+                tag: "控件交互"
+            },
+            { 
+                name: "应用功能", 
+                page: "group4.html", 
+                icon: "fas fa-th-large",
+                tag: "复杂交互"
+            },
+            { 
+                name: "导航", 
+                page: "group5.html", 
+                icon: "fas fa-map-signs",
+                tag: "页面交互"
+            }
+        ];
+
+        // 获取按钮容器
+        const buttonContainer = document.getElementById('button-container');
+
+        // 动态生成 5 个分类按钮
+        testCategories.forEach((category, index) => {
+            const button = document.createElement('button');
+            button.className = 'start-btn';
+            
+            // 设置按钮内容（图标 + 名称 + 标签 + 箭头）
+            button.innerHTML = `
+                <span class="category-name">
+                    <i class="${category.icon}"></i>
+                    ${category.name}
+                    <span class="category-tag">${category.tag}</span>
+                </span>
+                <span class="icon">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+            `;
+            
+            button.onclick = () => startTask(category.page, category.name);
+            buttonContainer.appendChild(button);
+        });
+
+        // 跳转到对应分组页面并传递分类参数
+        function startTask(pageUrl, categoryName) {
+            window.location.href = `${pageUrl}?category=${encodeURIComponent(categoryName)}`;
+        }
+    </script>
+</body>
+</html>

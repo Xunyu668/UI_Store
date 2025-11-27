@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI交互测试 - 练习3/3</title>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局样式重置与基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* 装饰元素 */
+        .decor-element {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.08);
+            z-index: -1;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .decor-1 {
+            width: 250px;
+            height: 250px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .decor-2 {
+            width: 350px;
+            height: 350px;
+            bottom: 10%;
+            right: 5%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-25px) translateX(15px);
+            }
+        }
+
+        /* 进度文本样式 */
+        .progress-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .progress-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 15px;
+            height: 15px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* 容器布局样式 */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            margin: 30px auto;
+            flex-wrap: wrap;
+        }
+
+        .left, .right {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            padding: 25px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+        }
+
+        .left:hover, .right:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .middle {
+            flex: 1.2;
+            min-width: 350px;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 左侧表格样式 */
+        .left h3, .right h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .left h3 i, .right h3 i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .left table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .left th {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .left td {
+            border: 1px solid var(--border-color);
+            border-top: none;
+            padding: 12px 12px;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .left tr:hover td {
+            background-color: #f0f5ff;
+            transform: translateX(3px);
+        }
+
+        .left tr:last-child td:first-child {
+            border-bottom-left-radius: var(--radius-sm);
+        }
+
+        .left tr:last-child td:last-child {
+            border-bottom-right-radius: var(--radius-sm);
+        }
+
+        /* 中间图片容器样式 */
+        .image-container {
+            width: 100%;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            border: 1px solid var(--border-color);
+        }
+
+        .image-container:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-color);
+        }
+
+        .middle img {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-normal);
+        }
+
+        .middle img:hover {
+            transform: scale(1.01);
+        }
+
+        /* 右侧任务说明样式 */
+        .right {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right .task-list {
+            margin-bottom: 30px;
+        }
+
+        .important-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 15px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .important-text::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .important-text-red {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--warning-color) !important;
+            margin: 12px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .important-text-red::before {
+            content: '!';
+            position: absolute;
+            left: 0;
+            background: var(--warning-color);
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+
+        /* 按钮样式 */
+        .end-btn {
+            margin-top: auto;
+            padding: 14px 36px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .end-btn i {
+            font-size: 1.2rem;
+        }
+
+        .end-btn:hover {
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .end-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        /* 弹窗样式优化 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: var(--bg-white);
+            padding: 40px 60px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            max-width: 450px;
+            width: 90%;
+            transform: translateY(-20px);
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-title i {
+            font-size: 1.5em;
+        }
+
+        .modal-desc {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            line-height: 1.8;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-btn {
+            padding: 12px 36px;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition-normal);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 交互类型专属颜色 - 增强样式 */
+        .modal-title.click { 
+            color: #4CAF50; 
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .modal-title.slide { 
+            color: #2196F3; 
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+        }
+        .modal-title.drag { 
+            color: #FF9800; 
+            border-bottom: 2px solid #FF9800;
+            padding-bottom: 10px;
+        }
+        .modal-title.text { 
+            color: #9C27B0; 
+            border-bottom: 2px solid #9C27B0;
+            padding-bottom: 10px;
+        }
+        .modal-title.unrecognized { 
+            color: #f44336; 
+            border-bottom: 2px solid #f44336;
+            padding-bottom: 10px;
+        }
+
+        /* 弹窗按钮颜色对应交互类型 */
+        .modal-btn.click { background-color: #4CAF50; color: white; }
+        .modal-btn.slide { background-color: #2196F3; color: white; }
+        .modal-btn.drag { background-color: #FF9800; color: white; }
+        .modal-btn.text { background-color: #9C27B0; color: white; }
+        .modal-btn.unrecognized { background-color: #f44336; color: white; }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .container {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .left, .right, .middle {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .progress-text {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                margin: 15px auto;
+            }
+
+            .left, .right {
+                padding: 18px;
+            }
+
+            .image-container {
+                padding: 15px;
+            }
+
+            .end-btn {
+                padding: 12px 28px;
+                font-size: 1rem;
+            }
+
+            .modal-content {
+                padding: 30px 25px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .modal-desc {
+                font-size: 1rem;
+            }
+        }
+
+        /* 加载动画 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .image-container img {
+            animation: pulse 2s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+
+        /* 交互类型标签样式 - 对应专属颜色 */
+        .interaction-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .interaction-tag.click { background: #e8f5e9; color: #4CAF50; }
+        .interaction-tag.slide { background: #e3f2fd; color: #2196F3; }
+        .interaction-tag.drag { background: #fff3e0; color: #FF9800; }
+        .interaction-tag.text { background: #f3e5f5; color: #9C27B0; }
+
+        /* 完成提示 */
+        .completion-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="decor-element decor-1"></div>
+    <div class="decor-element decor-2"></div>
+
+    <div class="container">
+        <!-- 左侧任务说明部分-->
+        <div class="left">
+            <h3><i class="fas fa-book"></i>交互类型说明</h3>
+            <table>
+                <tr>
+                    <th>交互类型</th>
+                    <th>模拟方式</th>
+                </tr>
+                <tr>
+                    <td>点击</td>
+                    <td>在目标区域按一下鼠标左键</td>
+                </tr>
+                <tr>
+                    <td>滑动</td>
+                    <td>鼠标左键保持按住状态并拖动</td>
+                </tr>
+                <tr>
+                    <td>拖动</td>
+                    <td>同时按下鼠标左键和键盘中的“D”，移动鼠标到目标位置后释放</td>
+                </tr>
+                <tr>
+                    <td>文本输入</td>
+                    <td>同时按下鼠标左键和键盘中的“T”，将鼠标从文本框最左端移动到最右端后释放</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 中间部分：显示图片和按钮 -->
+        <div class="middle">
+            <span class="progress-text">练习3/3</span>
+            <div class="image-container">
+                <img id="taskImage" src="https://github.com/Xunyu668/UI_Store/raw/main/src/images/train3.png" alt="Task Image">
+            </div>       
+        </div>
+
+        <!-- 右侧说明部分-->
+        <div class="right">
+            <h3><i class="fas fa-tasks"></i>任务说明</h3>
+            <div class="task-list">
+                <p class="important-text">在中间的UI截图中进行“滑动”交互</p>
+            </div>
+            
+            <p class="important-text-red">请核对弹窗中系统记录的操作是否为您实际想要进行的操作。若不一致，可能原因如下：</p>
+            <p class="important-text-red">“D”和“T”支持大小写，无需刻意切换大写</p>
+            <p class="important-text-red">需键盘输入时键盘和鼠标必须同时按下同时释放</p>
+            
+            <button class="end-btn" onclick="endTracking()">
+                <i class="fas fa-check-circle"></i>
+                <span>完成练习</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 交互识别结果弹窗 -->
+    <div id="actionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">
+                <i class="fas fa-check-circle"></i>
+                交互识别结果
+            </div>
+            <div class="modal-desc" id="modalDesc">您的操作已被识别</div>
+            <button class="modal-btn" id="modalActionBtn" onclick="closeModal()">确认</button>
+        </div>
+    </div>
+
+    <!-- 星星拖尾效果 -->
+    <span class="js-cursor-container"></span>
+    <script src="script/星星拖尾.js"></script>
+    <script src="script/点击烟花.js"></script>
+
+    <!-- JavaScript 部分 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let taskImage = document.getElementById('taskImage');
+            let displayedWidth = 0;
+            let displayedHeight = 0;
+            let thresholdCalculated = false;
+            // 获取弹窗元素
+            const modal = document.getElementById('actionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDesc = document.getElementById('modalDesc');
+            const modalActionBtn = document.getElementById('modalActionBtn');
+
+            // 确保图片加载完毕后获取尺寸
+            taskImage.onload = function() {
+                let imageLoadTimestamp = new Date().getTime();
+                console.log('taskImage加载完成的时间戳:', imageLoadTimestamp);
+                displayedWidth = taskImage.clientWidth;
+                displayedHeight = taskImage.clientHeight;
+                console.log('图片的显示尺寸:', displayedWidth, displayedHeight);
+                const slideThreshold = Math.min(displayedWidth * 0.04, displayedHeight * 0.04);
+                console.log('计算的滑动阈值:', slideThreshold);
+                thresholdCalculated = true;
+            }
+
+            // 如果图片已经加载，直接获取尺寸
+            if (taskImage.complete) {
+                taskImage.onload();
+            }
+
+            let trackingStarted = true;
+            let startTime = 0;
+            let endTime = 0;
+            let startCoords = { x: 0, y: 0 };
+            let endCoords = { x: 0, y: 0 };
+            let keyPressed = false;
+            let keyDown = null;
+
+            // 启动数据收集
+            window.onload = function() {    
+                let trackingStarted = true;    
+                taskImage.addEventListener('mousedown', handleMouseDown);
+                taskImage.addEventListener('mouseup', handleMouseUp);
+                taskImage.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('keydown', handleKeyDown);
+                document.addEventListener('keyup', handleKeyUp);
+                startTime = new Date().getTime();
+                document.addEventListener('dragstart', function(event) {
+                    event.preventDefault();
+                });
+            };
+
+            // 结束数据收集
+            window.endTracking = function() {
+                trackingStarted = false;
+                document.getElementById('taskImage').removeEventListener('mousedown', handleMouseDown);
+                document.getElementById('taskImage').removeEventListener('mouseup', handleMouseUp);
+                document.getElementById('taskImage').removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('keydown', handleKeyDown);
+                document.removeEventListener('keyup', handleKeyUp);   
+                window.location.href = "home.html";      
+            };
+
+            // 处理键盘按下事件：支持大小写D、T
+            function handleKeyDown(event) {
+                keyDown = event.key;
+                if (keyDown === "D" || keyDown === "d" || keyDown === "T" || keyDown === "t") {
+                    keyPressed = true;
+                }
+            }
+
+            // 处理键盘抬起事件
+            function handleKeyUp(event) {
+                keyPressed = false;
+                keyDown = null;
+            }
+
+            // 处理鼠标按下事件
+            function handleMouseDown(event) {
+                if (trackingStarted) {
+                    startCoords = { x: event.offsetX, y: event.offsetY };
+                    startTime = new Date().getTime();
+                    console.log(`鼠标点击开始 - 时间: ${startTime}, 坐标: (${startCoords.x}, ${startCoords.y})`);
+                }
+            }
+
+            // 处理鼠标抬起事件
+            function handleMouseUp(event) {
+                if (trackingStarted) {
+                    endCoords = { x: event.offsetX, y: event.offsetY };
+                    endTime = new Date().getTime();
+                    const duration = endTime - startTime;
+                    const distance = Math.sqrt(Math.pow(endCoords.x - startCoords.x, 2) + Math.pow(endCoords.y - startCoords.y, 2));
+                    let actionType = "未识别";
+                    let typeClass = "unrecognized";
+                    let iconClass = "fas fa-exclamation-circle";
+
+                    if (thresholdCalculated) {
+                        const slideThreshold = Math.min(displayedWidth * 0.04, displayedHeight * 0.04); 
+
+                        // 优先判断文本输入（T/t）
+                        if (keyDown === "T" || keyDown === "t") {
+                            actionType = "文本输入";
+                            typeClass = "text";
+                            iconClass = "fas fa-keyboard";
+                        } 
+                        // 再判断拖动（D/d）
+                        else if (keyDown === "D" || keyDown === "d") {
+                            actionType = "拖动";
+                            typeClass = "drag";
+                            iconClass = "fas fa-hand-paper";
+                        }
+                        // 最后判断点击/滑动
+                        else if (duration < 500 && distance < slideThreshold) {
+                            actionType = "点击";
+                            typeClass = "click";
+                            iconClass = "fas fa-mouse-pointer";
+                        } else if (distance > slideThreshold) {
+                            actionType = "滑动";
+                            typeClass = "slide";
+                            iconClass = "fas fa-arrows-alt-h";
+                        }
+                    }
+
+                    console.log(`识别结果: ${actionType}, 持续时间: ${duration}ms, 位移: ${distance}px`);
+                    // 显示弹窗并设置对应样式
+                    showModal(actionType, typeClass, iconClass);
+                }
+            }
+
+            // 处理鼠标移动事件
+            function handleMouseMove(event) {
+                if (trackingStarted && event.buttons === 1) {
+                    endCoords = { x: event.offsetX, y: event.offsetY };
+                }
+            }
+
+            // 显示弹窗函数（带类型样式和图标）
+            function showModal(actionType, typeClass, iconClass) {
+                // 移除之前的类型样式
+                modalTitle.className = "modal-title";
+                modalActionBtn.className = "modal-btn";
+                
+                // 添加当前类型样式
+                modalTitle.classList.add(typeClass);
+                modalActionBtn.classList.add(typeClass);
+                
+                // 更新图标和文本
+                modalTitle.innerHTML = `<i class="${iconClass}"></i> 交互识别结果`;
+                modalDesc.textContent = `您的操作已识别为：${actionType}`;
+                
+                modal.style.display = "flex"; // 显示弹窗
+            }
+
+            // 关闭弹窗函数
+            window.closeModal = function() {
+                modal.style.display = "none"; // 隐藏弹窗
+            }
+
+            // 点击弹窗外部关闭弹窗
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
