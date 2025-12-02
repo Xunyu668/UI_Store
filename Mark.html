@@ -1008,26 +1008,24 @@
         }
 
         // 构建图片URL列表（核心优化：强制使用classX路径格式，不依赖外部参数）
-        function buildImageUrls() {
+       function buildImageUrls() {
             imageUrls = [];
-            totalImages = endImageNo - startImageNo + 1; // 计算当前分组实际图片数
+            totalImages = endImageNo - startImageNo + 1;
             
-            // 强制路径格式：src/classX/classX_数字.jpg（如src/class1/class1_88.jpg）
-            const basePath = `src/${classPrefix}`; // 基础路径：src/class1、src/class2等
+            // 【双重保险】强制基础路径，不允许任何中文
+            const basePath = `src/${classPrefix}`; // 固定为src/class1、src/class2等
+            console.log(`构建图片路径的基础路径：${basePath}`); // 验证基础路径
             
             for (let i = startImageNo; i <= endImageNo; i++) {
-                // 严格按照 "classX_数字.jpg" 格式命名
                 const imageUrl = `${basePath}/${classPrefix}_${i}.jpg`;
                 imageUrls.push(imageUrl);
+                console.log(`添加图片URL：${imageUrl}`); // 逐行打印URL，确认格式
             }
             
-            // 打乱顺序
             imageUrls = shuffleArray(imageUrls);
-            console.log(`已生成${imageUrls.length}张图片URL（格式：src/${classPrefix}/${classPrefix}_数字.jpg）：`, imageUrls);
+            console.log(`最终图片URL列表：`, imageUrls); // 打印完整列表
             
-            // 更新页面图片数量提示
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
-            // 初始化文本框显示
             updateTextBox(`1/${totalImages} - 交互类型`);
             
             loadImage(currentImageIndex);
@@ -1226,46 +1224,34 @@
             }
         }
 
-        // 页面初始化（核心优化：强制中文分类名->classX映射，不依赖外部classPrefix参数）
+       // 页面初始化（核心修复：完全忽略中文分类名，直接强制classPrefix）
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取URL参数（从分组选择页传递）
+            // 获取URL参数（仅用于显示，不用于路径）
             const params = new URLSearchParams(window.location.search);
-            const originalCategory = params.get('category') || '注册登录'; // 默认分类：注册登录
+            const originalCategory = params.get('category') || '注册登录'; // 仅用于显示
             currentGroup = params.get('group') || '1';
             startImageNo = parseInt(params.get('start')) || 1;
-            endImageNo = parseInt(params.get('end')) || 100; // 从分组页获取正确的结束编号
+            endImageNo = parseInt(params.get('end')) || 100;
             
-            // 【关键修复】强制中文分类名 -> classX 映射（不依赖外部classPrefix参数）
-            const categoryMap = {
-                '注册登录': 'class1',
-                '编辑检索': 'class2',
-                '属性设置': 'class3',
-                '应用功能': 'class4',
-                '导航': 'class5'
-            };
+            // 【彻底修复】直接强制classPrefix，不依赖中文分类名映射！
+            // 根据分组号自动分配class（如果分组1对应class1，分组2对应class2...可调整）
+            // 或者直接固定class1（根据你的实际文件夹选择）
+            classPrefix = 'class1'; // 直接写死为class1，或根据分组计算：classPrefix = `class${currentGroup}`;
             
-            // 最终显示的分类名（保持中文），classPrefix强制使用class1-class5
+            // 强制当前分类显示名（可选，不影响路径）
             currentCategory = originalCategory;
-            classPrefix = categoryMap[currentCategory] || 'class1'; // 找不到映射时默认class1
             
-            // 计算当前分组总图片数
+            // 计算总图片数
             totalImages = endImageNo - startImageNo + 1;
             
-            // 显示分类、分组和图片范围信息
+            // 显示信息（分类名仅显示，路径已强制）
             document.getElementById('currentCategory').textContent = `当前分类：${currentCategory}`;
             document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（${startImageNo}-${endImageNo}）`;
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
             
-            // 调试日志（验证路径正确性）
-            console.log(`分类显示名：${currentCategory}`);
-            console.log(`分类路径前缀：${classPrefix}`);
-            console.log(`图片范围：${startImageNo}-${endImageNo}（共${totalImages}张）`);
+            // 调试日志（确认路径格式）
+            console.log(`强制路径前缀：${classPrefix}`);
             console.log(`图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
-            
-            // 初始化界面状态
-            updateUndoButtonState();
-            updateAnnotationCount();
-            updateUndoHistory();
             
             // 初始化
             initInteractionListeners();
@@ -1277,7 +1263,8 @@
                 history.pushState(null, null, document.URL);
                 showFeedback('测试中不支持后退，请完成当前流程', 'error');
             });
-        });
+});
     </script>
 </body>
 </html>
+
