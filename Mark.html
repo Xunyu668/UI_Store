@@ -1075,7 +1075,7 @@
             updateUndoHistory();
         }
 
-        // 下载测试结果
+        // 下载测试结果（核心优化：移除打印逻辑，直接下载+跳转）
         function downloadResults(results) {
             const finalResults = {
                 testStartTime: new Date(allResults[0]?.taskStartData[0]?.taskStartTimestamp || Date.now()).toLocaleString(),
@@ -1099,6 +1099,11 @@
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 100);
             showFeedback('测试结果已下载');
+            
+            // 直接跳转回分组选择页（无打印步骤）
+            setTimeout(() => {
+                window.location.href = `group-select.html?category=${encodeURIComponent(currentCategory)}`;
+            }, 1500); // 1.5秒后自动跳转，给下载留时间
         }
 
         // 初始化交互事件监听
@@ -1218,11 +1223,7 @@
                 setTimeout(window.startTracking, 500);
             } else {
                 downloadResults(allResults);
-                showFeedback(`当前分组（${startImageNo}-${endImageNo}）测试完成，即将返回分组选择页`);
-                setTimeout(() => {
-                    // 返回分组选择页，携带当前分类参数
-                    window.location.href = `group-select.html?category=${encodeURIComponent(currentCategory)}`;
-                }, 3000);
+                // 移除原有的跳转提示，直接在downloadResults中处理跳转
             }
         }
 
@@ -1283,4 +1284,3 @@
     </script>
 </body>
 </html>
-
