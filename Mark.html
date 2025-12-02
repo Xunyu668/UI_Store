@@ -795,8 +795,7 @@
         const slideThresholdRatio = 0.04;
         let currentCategory = '';
         let currentGroup = '';
-        let classPrefix = '';
-        let baseImageUrl = ''; // 改为相对路径，不再是GitHub境外路径
+        let classPrefix = ''; // 仅使用class1-class5作为前缀，不使用中文
         let startImageNo = 1;
         let endImageNo = 100; // 默认每组100张
         let totalImages = 100; // 当前分组总图片数
@@ -947,7 +946,7 @@
             const taskImage = document.getElementById('taskImage');
             const imageUrl = imageUrls[index];
 
-            // 缓存优化（保留原逻辑，适配相对路径）
+            // 缓存优化（适配class前缀路径）
             const imageCacheKey = `uiTest_${classPrefix}_${startImageNo}_${endImageNo}_${index}`;
             const cachedUrl = localStorage.getItem(imageCacheKey);
             if (cachedUrl === imageUrl) {
@@ -989,7 +988,7 @@
                 if (currentRetryCount < maxRetryCount) {
                     console.log(`重试加载（${currentRetryCount}/${maxRetryCount}）：${imageUrl}`);
                     showFeedback(`图片加载失败，正在重试（${currentRetryCount}/${maxRetryCount}）`, 'error');
-                    // 相对路径重试时添加时间戳，避免缓存干扰
+                    // 添加时间戳避免缓存干扰
                     setTimeout(() => taskImage.src = `${imageUrl}?retry=${currentRetryCount}&t=${Date.now()}`, 1000);
                 } else {
                     document.getElementById('loadingOverlay').style.display = 'none';
@@ -1008,19 +1007,23 @@
             }
         }
 
-        // 构建图片URL列表（核心修改：使用相对路径）
+        // 构建图片URL列表（核心优化：强制使用classX路径格式，不依赖外部参数）
         function buildImageUrls() {
             imageUrls = [];
             totalImages = endImageNo - startImageNo + 1; // 计算当前分组实际图片数
-            // 生成当前分组的图片URL（相对路径格式：src/class1/class1_1.jpg）
+            
+            // 强制路径格式：src/classX/classX_数字.jpg（如src/class1/class1_88.jpg）
+            const basePath = `src/${classPrefix}`; // 基础路径：src/class1、src/class2等
+            
             for (let i = startImageNo; i <= endImageNo; i++) {
-                // 关键修改：相对路径 = baseImageUrl（如src/class1） + 文件名
-                const imageUrl = `${baseImageUrl}/${classPrefix}_${i}.jpg`;
+                // 严格按照 "classX_数字.jpg" 格式命名
+                const imageUrl = `${basePath}/${classPrefix}_${i}.jpg`;
                 imageUrls.push(imageUrl);
             }
+            
             // 打乱顺序
             imageUrls = shuffleArray(imageUrls);
-            console.log(`已生成${imageUrls.length}张图片URL（相对路径）：`, imageUrls);
+            console.log(`已生成${imageUrls.length}张图片URL（格式：src/${classPrefix}/${classPrefix}_数字.jpg）：`, imageUrls);
             
             // 更新页面图片数量提示
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
@@ -1091,7 +1094,7 @@
             const a = document.createElement('a');
             
             const timestamp = new Date().toISOString().replace(/[-:\.T]/g, '').slice(0, 14);
-            a.download = `UI测试_${currentCategory}_分组${currentGroup}_${startImageNo}-${endImageNo}_${timestamp}.json`;
+            a.download = `UI测试_${currentCategory}_分组${currentGroup}_${classPrefix}_${startImageNo}-${endImageNo}_${timestamp}.json`;
             a.href = url;
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 100);
@@ -1188,9 +1191,9 @@
         function endTracking() {
             window.stopTracking();
 
-            // 记录当前图片结果
+            // 记录当前图片结果（保留classX格式的文件名）
             const taskImage = document.getElementById('taskImage');
-            const imageName = taskImage.src.split('/').pop().split('?')[0]; // 移除参数，获取纯文件名
+            const imageName = taskImage.src.split('/').pop().split('?')[0]; // 移除参数，获取纯文件名（classX_数字.jpg）
             allResults.push({
                 imageIndex: currentImageIndex + 1,
                 imageName: imageName,
@@ -1223,18 +1226,16 @@
             }
         }
 
-        // 页面初始化（核心修改：接收相对路径的baseUrl和正确的图片范围）
+        // 页面初始化（核心优化：强制中文分类名->classX映射，不依赖外部classPrefix参数）
         document.addEventListener('DOMContentLoaded', function() {
             // 获取URL参数（从分组选择页传递）
             const params = new URLSearchParams(window.location.search);
-            let originalCategory = params.get('category') || '未知分类'; // 保存原始分类名（用于显示）
-            currentGroup = params.get('group') || '未知分组';
+            const originalCategory = params.get('category') || '注册登录'; // 默认分类：注册登录
+            currentGroup = params.get('group') || '1';
             startImageNo = parseInt(params.get('start')) || 1;
             endImageNo = parseInt(params.get('end')) || 100; // 从分组页获取正确的结束编号
-            const receivedBaseUrl = params.get('baseUrl') || ''; // 从分组页获取的基础路径
-            classPrefix = params.get('classPrefix') || 'class1'; // 从分组页获取的分类前缀
             
-            // 中文分类名 -> classX 映射逻辑（保持不变）
+            // 【关键修复】强制中文分类名 -> classX 映射（不依赖外部classPrefix参数）
             const categoryMap = {
                 '注册登录': 'class1',
                 '编辑检索': 'class2',
@@ -1243,10 +1244,9 @@
                 '导航': 'class5'
             };
             
-            // 最终显示的分类名（保持中文）
+            // 最终显示的分类名（保持中文），classPrefix强制使用class1-class5
             currentCategory = originalCategory;
-            // 图片基础路径（使用分组页传递的baseUrl，如"src/class1"）
-            baseImageUrl = receivedBaseUrl || `src/${classPrefix}`;
+            classPrefix = categoryMap[currentCategory] || 'class1'; // 找不到映射时默认class1
             
             // 计算当前分组总图片数
             totalImages = endImageNo - startImageNo + 1;
@@ -1256,11 +1256,11 @@
             document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（${startImageNo}-${endImageNo}）`;
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
             
-            // 调试日志
-            console.log(`分类：${currentCategory}，分组：${currentGroup}`);
+            // 调试日志（验证路径正确性）
+            console.log(`分类显示名：${currentCategory}`);
+            console.log(`分类路径前缀：${classPrefix}`);
             console.log(`图片范围：${startImageNo}-${endImageNo}（共${totalImages}张）`);
-            console.log(`图片基础路径：${baseImageUrl}`);
-            console.log(`分类前缀：${classPrefix}`);
+            console.log(`图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
             
             // 初始化界面状态
             updateUndoButtonState();
