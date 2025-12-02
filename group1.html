@@ -144,12 +144,12 @@
             font-style: italic;
         }
 
-        /* 分组容器样式 */
+        /* 分组容器样式 - 扩大最大宽度以容纳24个分组 */
         .group-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 25px;
-            max-width: 800px;
+            max-width: 1200px; /* 扩大最大宽度 */
             width: 100%;
             margin: 0 auto 40px;
             padding: 0 20px;
@@ -256,6 +256,18 @@
         }
 
         /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .group-container {
+                max-width: 1000px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .group-container {
+                max-width: 800px;
+            }
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.8rem;
@@ -314,7 +326,7 @@
             }
         }
 
-        /* 加载动画效果 */
+        /* 加载动画效果 - 为24个分组添加依次显示动画 */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -340,8 +352,31 @@
             opacity: 0;
         }
 
+        /* 为24个分组设置依次显示的动画延迟 */
         .group-container .group-btn:nth-child(1) { animation-delay: 0.3s; }
-        .group-container .group-btn:nth-child(2) { animation-delay: 0.4s; }
+        .group-container .group-btn:nth-child(2) { animation-delay: 0.35s; }
+        .group-container .group-btn:nth-child(3) { animation-delay: 0.4s; }
+        .group-container .group-btn:nth-child(4) { animation-delay: 0.45s; }
+        .group-container .group-btn:nth-child(5) { animation-delay: 0.5s; }
+        .group-container .group-btn:nth-child(6) { animation-delay: 0.55s; }
+        .group-container .group-btn:nth-child(7) { animation-delay: 0.6s; }
+        .group-container .group-btn:nth-child(8) { animation-delay: 0.65s; }
+        .group-container .group-btn:nth-child(9) { animation-delay: 0.7s; }
+        .group-container .group-btn:nth-child(10) { animation-delay: 0.75s; }
+        .group-container .group-btn:nth-child(11) { animation-delay: 0.8s; }
+        .group-container .group-btn:nth-child(12) { animation-delay: 0.85s; }
+        .group-container .group-btn:nth-child(13) { animation-delay: 0.9s; }
+        .group-container .group-btn:nth-child(14) { animation-delay: 0.95s; }
+        .group-container .group-btn:nth-child(15) { animation-delay: 1.0s; }
+        .group-container .group-btn:nth-child(16) { animation-delay: 1.05s; }
+        .group-container .group-btn:nth-child(17) { animation-delay: 1.1s; }
+        .group-container .group-btn:nth-child(18) { animation-delay: 1.15s; }
+        .group-container .group-btn:nth-child(19) { animation-delay: 1.2s; }
+        .group-container .group-btn:nth-child(20) { animation-delay: 1.25s; }
+        .group-container .group-btn:nth-child(21) { animation-delay: 1.3s; }
+        .group-container .group-btn:nth-child(22) { animation-delay: 1.35s; }
+        .group-container .group-btn:nth-child(23) { animation-delay: 1.4s; }
+        .group-container .group-btn:nth-child(24) { animation-delay: 1.45s; }
     </style>
 </head>
 <body>
@@ -352,7 +387,7 @@
     <div class="header-container">
         <h1>选择测试分组</h1>
         <div class="category-name" id="categoryName"></div>
-        <p class="subtitle">每个分组包含50张图片，请选择要标注的分组：</p>
+        <p class="subtitle">前23组每组包含100张图片，最后一组包含62张图片，请选择要标注的分组：</p>
         <p class="subtitle-note">提示：完成一个分组后可以返回选择其他分组继续标注</p>
     </div>
 
@@ -369,14 +404,14 @@
         // 从URL获取分类信息
         const params = new URLSearchParams(window.location.search);
         const categoryName = params.get('category') || 'class1'; // 默认分类为class1
-        // 图片基础URL
+        // 图片基础URL（本地路径格式，对应分类文件夹）
         const baseUrl = `src/${categoryName}`;
         
         // 显示当前分类名称
         document.getElementById('categoryName').textContent = `当前分类: ${categoryName}`;
         
-        // 每个分类下的分组数量（根据需求设置为2个分组）
-        const groupCount = 2;
+        // 每个分类下的分组数量（共24组）
+        const groupCount = 24;
         
         // 生成分组按钮
         const groupContainer = document.getElementById('groupContainer');
@@ -385,8 +420,16 @@
             button.className = 'group-btn';
             
             // 计算每个分组的图片范围
-            const start = (i - 1) * 50 + 1;
-            const end = i * 50;
+            let start, end;
+            if (i < groupCount) {
+                // 前23组，每组100张图片
+                start = (i - 1) * 100 + 1;
+                end = i * 100;
+            } else {
+                // 第24组，62张图片（从2301到2362）
+                start = 2301;
+                end = 2362;
+            }
             
             // 设置按钮内容（图标 + 分组名称 + 图片数量）
             button.innerHTML = `
@@ -395,19 +438,21 @@
                 <span class="group-count">${start}-${end} 张图片</span>
             `;
             
-            button.onclick = () => goToMarkPage(baseUrl, categoryName, i, start, end);
+            // 传递分类前缀（classPrefix）用于标注页面识别分类文件夹
+            button.onclick = () => goToMarkPage(baseUrl, categoryName, i, start, end, categoryName);
             groupContainer.appendChild(button);
         }
         
-        // 跳转到标注页面，传递分组信息
-        function goToMarkPage(baseUrl, category, groupId, start, end) {
-            // 构建参数，包含基础URL、分类、分组ID及图片范围
+        // 跳转到标注页面，传递分组信息（新增classPrefix参数）
+        function goToMarkPage(baseUrl, category, groupId, start, end, classPrefix) {
+            // 构建参数，包含基础URL、分类、分组ID、图片范围和分类前缀
             const params = new URLSearchParams();
             params.append('baseUrl', baseUrl);
             params.append('category', category);
             params.append('group', groupId);
             params.append('start', start);
             params.append('end', end);
+            params.append('classPrefix', classPrefix); // 新增分类前缀参数
             window.location.href = `Mark.html?${params.toString()}`;
         }
         
@@ -417,5 +462,4 @@
         }
     </script>
 </body>
-
 </html>
