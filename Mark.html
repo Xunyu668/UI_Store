@@ -795,10 +795,19 @@
         const slideThresholdRatio = 0.04;
         let currentCategory = '';
         let currentGroup = '';
-        let classPrefix = ''; // 仅使用class1-class5作为前缀，不使用中文
+        let classPrefix = ''; // 存储class1-class5前缀
         let startImageNo = 1;
         let endImageNo = 100; // 默认每组100张
         let totalImages = 100; // 当前分组总图片数
+
+        // 分类名到class前缀的映射关系（与分类列表严格对应）
+        const categoryToClassMap = {
+            "注册登录": "class1",
+            "编辑检索": "class2",
+            "属性设置": "class3",
+            "应用功能": "class4",
+            "导航": "class5"
+        };
 
         // 返回首页函数
         function goToHome() {
@@ -1007,27 +1016,35 @@
             }
         }
 
-        // 构建图片URL列表（核心优化：强制使用classX路径格式，不依赖外部参数）
-       function buildImageUrls() {
+        // 构建图片URL列表（优化版：根据分类名自动映射class前缀）
+        function buildImageUrls() {
             imageUrls = [];
             totalImages = endImageNo - startImageNo + 1;
             
-            // 【双重保险】强制基础路径，不允许任何中文
-            const basePath = `src/${classPrefix}`; // 固定为src/class1、src/class2等
-            console.log(`构建图片路径的基础路径：${basePath}`); // 验证基础路径
+            // 根据当前分类名获取对应的class前缀（默认class1）
+            classPrefix = categoryToClassMap[currentCategory] || "class1";
             
+            // 【确认路径格式】强制为 src/classX/classX_数字.jpg
+            const basePath = `src/${classPrefix}`; 
+            console.log(`当前分类：${currentCategory} → 映射class前缀：${classPrefix}`);
+            console.log(`图片基础路径：${basePath}`);
+            
+            // 生成图片URL（从startImageNo到endImageNo）
             for (let i = startImageNo; i <= endImageNo; i++) {
                 const imageUrl = `${basePath}/${classPrefix}_${i}.jpg`;
                 imageUrls.push(imageUrl);
-                console.log(`添加图片URL：${imageUrl}`); // 逐行打印URL，确认格式
+                console.log(`添加图片URL：${imageUrl}`);
             }
             
+            // 打乱图片顺序（保持原洗牌逻辑）
             imageUrls = shuffleArray(imageUrls);
-            console.log(`最终图片URL列表：`, imageUrls); // 打印完整列表
+            console.log(`最终打乱后的图片列表（共${imageUrls.length}张）：`, imageUrls);
             
+            // 更新页面显示
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
             updateTextBox(`1/${totalImages} - 交互类型`);
             
+            // 加载第一张图片
             loadImage(currentImageIndex);
         }
 
@@ -1224,36 +1241,32 @@
             }
         }
 
-       // 页面初始化（核心修复：完全忽略中文分类名，直接强制classPrefix）
+        // 页面初始化（优化版：通过分类名映射class前缀）
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取URL参数（仅用于显示，不用于路径）
+            // 获取URL参数
             const params = new URLSearchParams(window.location.search);
-            const originalCategory = params.get('category') || '注册登录'; // 仅用于显示
+            currentCategory = params.get('category') || '注册登录'; // 从URL获取分类名
             currentGroup = params.get('group') || '1';
             startImageNo = parseInt(params.get('start')) || 1;
             endImageNo = parseInt(params.get('end')) || 100;
             
-            // 【彻底修复】直接强制classPrefix，不依赖中文分类名映射！
-            // 根据分组号自动分配class（如果分组1对应class1，分组2对应class2...可调整）
-            // 或者直接固定class1（根据你的实际文件夹选择）
-            classPrefix = 'class1'; // 直接写死为class1，或根据分组计算：classPrefix = `class${currentGroup}`;
-            
-            // 强制当前分类显示名（可选，不影响路径）
-            currentCategory = originalCategory;
+            // 【关键逻辑】通过分类名获取对应的class前缀
+            classPrefix = categoryToClassMap[currentCategory] || "class1";
             
             // 计算总图片数
             totalImages = endImageNo - startImageNo + 1;
             
-            // 显示信息（分类名仅显示，路径已强制）
+            // 显示页面信息
             document.getElementById('currentCategory').textContent = `当前分类：${currentCategory}`;
             document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（${startImageNo}-${endImageNo}）`;
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
             
-            // 调试日志（确认路径格式）
-            console.log(`强制路径前缀：${classPrefix}`);
-            console.log(`图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
+            // 调试日志（确认映射关系和路径格式）
+            console.log(`分类名：${currentCategory}`);
+            console.log(`映射后的class前缀：${classPrefix}`);
+            console.log(`最终图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
             
-            // 初始化
+            // 初始化交互监听和图片加载
             initInteractionListeners();
             buildImageUrls();
             
@@ -1263,8 +1276,7 @@
                 history.pushState(null, null, document.URL);
                 showFeedback('测试中不支持后退，请完成当前流程', 'error');
             });
-});
+        });
     </script>
 </body>
 </html>
-
