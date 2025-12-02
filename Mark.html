@@ -800,6 +800,16 @@
         let endImageNo = 100; // 默认每组100张
         let totalImages = 100; // 当前分组总图片数
 
+        // 核心配置：分类与目标页面的固定映射关系
+        const categoryToPageMap = {
+            '注册登录': 'group1.html',
+            '编辑检索': 'group2.html',
+            '属性设置': 'group3.html',
+            '应用功能': 'group4.html',
+            '导航': 'group5.html'
+            // 可根据需要扩展更多分类映射
+        };
+
         // 返回首页函数
         function goToHome() {
             if (confirm('确认返回首页吗？当前测试进度不会保存！')) {
@@ -1075,7 +1085,7 @@
             updateUndoHistory();
         }
 
-        // 下载测试结果（核心优化：移除打印逻辑，直接下载+跳转）
+        // 下载测试结果（核心优化：按分类固定跳转对应group页面）
         function downloadResults(results) {
             const finalResults = {
                 testStartTime: new Date(allResults[0]?.taskStartData[0]?.taskStartTimestamp || Date.now()).toLocaleString(),
@@ -1099,11 +1109,23 @@
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 100);
             showFeedback('测试结果已下载');
-            
-            // 直接跳转回分组选择页（无打印步骤）
+
+            // 核心修改：按分类固定跳转
+            let targetUrl = '';
+            if (categoryToPageMap[currentCategory]) {
+                // 匹配到配置的分类：跳转到对应的group页面
+                targetUrl = categoryToPageMap[currentCategory];
+                showFeedback(`即将跳转到${targetUrl}`, 'success');
+            } else {
+                // 未配置的分类：默认跳回分组选择页
+                targetUrl = `group-select.html?category=${encodeURIComponent(currentCategory)}`;
+                showFeedback(`即将返回${currentCategory}分组选择页`, 'success');
+            }
+
+            // 1.5秒后跳转（给下载留时间）
             setTimeout(() => {
-                window.location.href = `group-select.html?category=${encodeURIComponent(currentCategory)}`;
-            }, 1500); // 1.5秒后自动跳转，给下载留时间
+                window.location.href = targetUrl;
+            }, 1500);
         }
 
         // 初始化交互事件监听
@@ -1237,7 +1259,7 @@
             endImageNo = parseInt(params.get('end')) || 100; // 从分组页获取正确的结束编号
             classPrefix = params.get('classPrefix') || 'class1'; // 强制从参数获取class前缀（class1-class5）
             
-            // 中文分类名 -> classX 映射（双重保障，避免参数传递失败）
+            // 中文分类名 -> classX 映射（双重保障，避免参数错误）
             const categoryMap = {
                 '注册登录': 'class1',
                 '编辑检索': 'class2',
@@ -1264,6 +1286,7 @@
             console.log(`分类路径前缀：${classPrefix}`);
             console.log(`图片范围：${startImageNo}-${endImageNo}（共${totalImages}张）`);
             console.log(`图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
+            console.log(`目标跳转页面：${categoryToPageMap[currentCategory] || '分组选择页'}`);
             
             // 初始化界面状态
             updateUndoButtonState();
