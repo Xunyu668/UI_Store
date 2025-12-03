@@ -799,15 +799,15 @@
         let startImageNo = 1;
         let endImageNo = 100; // 默认每组100张
         let totalImages = 100; // 当前分组总图片数
+        let originalCategoryParam = ''; // 保存原始编码后的分类参数
 
-        // 核心配置：分类与目标页面的固定映射关系
+        // 核心配置：分类与目标页面的固定映射关系（最终版）
         const categoryToPageMap = {
             '注册登录': 'group1.html',
             '编辑检索': 'group2.html',
             '属性设置': 'group3.html',
             '应用功能': 'group4.html',
             '导航': 'group5.html'
-            // 可根据需要扩展更多分类映射
         };
 
         // 返回首页函数
@@ -1085,7 +1085,7 @@
             updateUndoHistory();
         }
 
-        // 下载测试结果（核心优化：按分类固定跳转对应group页面）
+        // 下载测试结果（最终版跳转逻辑：彻底移除group-select，保留编码参数）
         function downloadResults(results) {
             const finalResults = {
                 testStartTime: new Date(allResults[0]?.taskStartData[0]?.taskStartTimestamp || Date.now()).toLocaleString(),
@@ -1110,17 +1110,13 @@
             setTimeout(() => URL.revokeObjectURL(url), 100);
             showFeedback('测试结果已下载');
 
-            // 核心修改：按分类固定跳转
-            let targetUrl = '';
-            if (categoryToPageMap[currentCategory]) {
-                // 匹配到配置的分类：跳转到对应的group页面
-                targetUrl = categoryToPageMap[currentCategory];
-                showFeedback(`即将跳转到${targetUrl}`, 'success');
-            } else {
-                // 未配置的分类：默认跳回分组选择页
-                targetUrl = `group-select.html?category=${encodeURIComponent(currentCategory)}`;
-                showFeedback(`即将返回${currentCategory}分组选择页`, 'success');
-            }
+            // 核心修复：按分类跳转对应group页面，保留原始编码的category参数
+            let targetPage = categoryToPageMap[currentCategory] || 'group1.html'; // 默认group1.html
+            // 拼接URL：目标页面 + 原始编码的category参数（如?category=%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95）
+            let targetUrl = `${targetPage}?category=${originalCategoryParam}`;
+            
+            console.log('最终跳转URL：', targetUrl);
+            showFeedback(`即将跳转到${targetPage}`, 'success');
 
             // 1.5秒后跳转（给下载留时间）
             setTimeout(() => {
@@ -1245,21 +1241,24 @@
                 setTimeout(window.startTracking, 500);
             } else {
                 downloadResults(allResults);
-                // 移除原有的跳转提示，直接在downloadResults中处理跳转
             }
         }
 
-        // 页面初始化（核心优化：强化classPrefix传递，确保路径正确）
+        // 页面初始化（最终版：正确处理编码参数）
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取URL参数（从分组选择页传递）
+            // 获取URL参数（关键：保存原始编码的category参数，不解码）
             const params = new URLSearchParams(window.location.search);
-            const originalCategory = params.get('category') || '未知分类'; // 中文分类名（仅用于显示）
+            originalCategoryParam = params.get('category') || ''; // 保存原始编码值（如%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95）
+            const encodedCategory = originalCategoryParam;
+            // 解码用于显示和匹配
+            const decodedCategory = encodedCategory ? decodeURIComponent(encodedCategory) : '注册登录';
+            
             currentGroup = params.get('group') || '未知分组';
             startImageNo = parseInt(params.get('start')) || 1;
-            endImageNo = parseInt(params.get('end')) || 100; // 从分组页获取正确的结束编号
-            classPrefix = params.get('classPrefix') || 'class1'; // 强制从参数获取class前缀（class1-class5）
+            endImageNo = parseInt(params.get('end')) || 100;
+            classPrefix = params.get('classPrefix') || 'class1';
             
-            // 中文分类名 -> classX 映射（双重保障，避免参数错误）
+            // 中文分类名 -> classX 映射（双重保障）
             const categoryMap = {
                 '注册登录': 'class1',
                 '编辑检索': 'class2',
@@ -1268,9 +1267,9 @@
                 '导航': 'class5'
             };
             
-            // 最终显示的分类名（保持中文），classPrefix严格使用class1-class5
-            currentCategory = originalCategory;
-            // 强制覆盖classPrefix，确保与分类对应（避免参数错误）
+            // 最终使用解码后的分类名进行匹配和显示
+            currentCategory = decodedCategory;
+            // 强制classPrefix与分类对应
             classPrefix = categoryMap[currentCategory] || classPrefix;
             
             // 计算当前分组总图片数
@@ -1281,12 +1280,12 @@
             document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（${startImageNo}-${endImageNo}）`;
             document.getElementById('imageCountDesc').textContent = `共${totalImages}张UI截图，请完成所有标注`;
             
-            // 调试日志（验证路径正确性）
-            console.log(`分类显示名：${currentCategory}`);
-            console.log(`分类路径前缀：${classPrefix}`);
-            console.log(`图片范围：${startImageNo}-${endImageNo}（共${totalImages}张）`);
-            console.log(`图片路径格式：src/${classPrefix}/${classPrefix}_数字.jpg`);
-            console.log(`目标跳转页面：${categoryToPageMap[currentCategory] || '分组选择页'}`);
+            // 调试日志（验证参数处理正确性）
+            console.log(`原始编码参数：category=${originalCategoryParam}`);
+            console.log(`解码后分类：${currentCategory}`);
+            console.log(`对应class前缀：${classPrefix}`);
+            console.log(`对应目标页面：${categoryToPageMap[currentCategory]}`);
+            console.log(`最终跳转URL预览：${categoryToPageMap[currentCategory]}?category=${originalCategoryParam}`);
             
             // 初始化界面状态
             updateUndoButtonState();
