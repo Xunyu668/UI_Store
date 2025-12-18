@@ -7,7 +7,7 @@
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 全局样式重置与基础设置 */
+        /* 保留所有原有样式，此处省略（样式无修改） */
         * {
             margin: 0;
             padding: 0;
@@ -35,7 +35,6 @@
             --transition-normal: 0.3s ease;
         }
 
-        /* 页面整体布局：适配不同屏幕尺寸 */
         body {
             font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
             margin: 0;
@@ -50,7 +49,6 @@
             position: relative;
         }
 
-        /* 装饰元素 */
         .decor-element {
             position: fixed;
             border-radius: 50%;
@@ -97,7 +95,6 @@
             gap: 20px;
         }
 
-        /* 扩大左侧容器宽度到30%，右侧调整为20%，中间保持45% */
         .left {
             width: 30%;
             padding: 20px;
@@ -218,7 +215,6 @@
             box-shadow: 0 5px 12px rgba(255, 152, 0, 0.3);
         }
 
-        /* 文本框靠左样式 */
         .text-box {
             box-sizing: border-box;
             width: 100%;
@@ -241,13 +237,12 @@
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05), 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
-        /* 表格样式：取消省略号，让文字完全显示 */
         .left table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             margin-top: 15px;
-            table-layout: auto; /* 自动布局，适应内容宽度 */
+            table-layout: auto;
             border-radius: var(--radius-md);
             overflow: hidden;
             box-shadow: var(--shadow-sm);
@@ -258,8 +253,8 @@
             border-bottom: none;
             padding: 12px 15px;
             text-align: left;
-            white-space: normal; /* 允许必要时换行，但因容器扩大基本不换行 */
-            word-wrap: break-word; /* 长单词换行，避免溢出 */
+            white-space: normal;
+            word-wrap: break-word;
             transition: var(--transition-normal);
         }
 
@@ -268,17 +263,16 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* 调整列宽比例，保证模拟方式列足够宽 */
         .left th:first-child,
         .left td:first-child {
-            width: 20%; /* 交互类型列占20% */
+            width: 20%;
             font-weight: 600;
             background-color: rgba(67, 97, 238, 0.05);
         }
 
         .left th:last-child,
         .left td:last-child {
-            width: 80%; /* 模拟方式列占80% */
+            width: 80%;
         }
 
         .left th {
@@ -293,7 +287,6 @@
             transform: translateX(3px);
         }
 
-        /* 撤销历史记录样式 */
         .undo-history {
             margin-top: 20px;
             padding: 15px;
@@ -335,7 +328,6 @@
             padding: 8px 0;
         }
 
-        /* 标注统计样式 */
         .annotation-count {
             margin-top: 15px;
             padding: 12px 15px;
@@ -448,13 +440,12 @@
             padding-left: 5px;
         }
 
-        /* 修复：调整重要文本的padding和伪元素定位，避免重叠 */
         .important-text {
             font-size: 17px;
             font-weight: 600;
             color: var(--text-dark);
             margin: 18px 0;
-            padding-left: 32px; /* 增加左内边距 */
+            padding-left: 32px;
             position: relative;
             line-height: 1.6;
         }
@@ -463,11 +454,11 @@
             content: '✓';
             position: absolute;
             left: 0;
-            top: 2px; /* 垂直居中调整 */
+            top: 2px;
             color: var(--success-color);
             font-weight: bold;
-            font-size: 20px; /* 调整图标大小 */
-            width: 24px; /* 固定宽度，避免重叠 */
+            font-size: 20px;
+            width: 24px;
             text-align: center;
         }
 
@@ -476,7 +467,7 @@
             font-weight: 600;
             color: var(--danger-color) !important;
             margin: 18px 0;
-            padding-left: 32px; /* 增加左内边距 */
+            padding-left: 32px;
             position: relative;
             line-height: 1.6;
         }
@@ -485,16 +476,16 @@
             content: '!';
             position: absolute;
             left: 0;
-            top: 2px; /* 垂直居中调整 */
+            top: 2px;
             background: var(--danger-color);
             color: white;
-            width: 24px; /* 增大图标容器 */
-            height: 24px; /* 增大图标容器 */
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            font-size: 14px; /* 调整文字大小 */
+            font-size: 14px;
         }
 
         h1 {
@@ -586,7 +577,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* 撤销动画效果 */
         @keyframes undoPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -597,7 +587,6 @@
             animation: undoPulse 0.5s ease;
         }
 
-        /* 图片加载错误样式 */
         #imageError {
             display: flex;
             align-items: center;
@@ -606,7 +595,6 @@
             cursor: pointer;
         }
 
-        /* 响应式设计 */
         @media (max-width: 1024px) {
             .container {
                 flex-direction: column;
@@ -637,7 +625,6 @@
                 justify-content: center;
                 margin-right: 0;
             }
-            /* 移动端进一步调整 */
             .important-text,
             .important-text-red {
                 padding-left: 28px;
@@ -662,7 +649,6 @@
             }
         }
 
-        /* 加载动画效果 */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -729,7 +715,6 @@
                 </tr>
             </table>
             
-            <!-- 标注统计 -->
             <div class="annotation-count" id="annotationCount">
                 <span><i class="fas fa-clipboard-check"></i> 当前标注数：0</span>
                 <span><i class="fas fa-undo"></i> 可撤销数：0</span>
@@ -740,7 +725,6 @@
                 <span>无标注可撤销</span>
             </button>
             
-            <!-- 撤销历史记录 -->
             <div class="undo-history">
                 <h4><i class="fas fa-history"></i> 最近撤销记录</h4>
                 <div id="undoHistoryContent" class="empty">
@@ -752,7 +736,6 @@
         <div class="middle">
             <h1>UI交互测试</h1>
             <div class="image-container">
-                <!-- 关键修改：移除了 crossorigin="anonymous" 属性 -->
                 <img id="taskImage" alt="UI截图加载中..." title="点击/拖动进行交互" loading="lazy">
             </div>
             <p id="imageError" style="color: var(--danger-color); font-weight: 600; display: none;">
@@ -795,12 +778,21 @@
         const slideThresholdRatio = 0.04;
         let currentCategory = '';
         let currentGroup = '';
-        let classPrefix = '';
+        let classPrefix = ''; // 不再强制设置，通过映射表获取
         let baseImageUrl = '';
-        let randomMin = 1; // 随机数最小值
-        let randomMax = 1200; // 随机数最大值
-        let imageCount = 50; // 每个分组的图片数量
-        let totalImageCount = 50; // 记录当前分组的总图片数
+        let randomMin = 1;
+        let randomMax = 1200;
+        let imageCount = 50;
+        let totalImageCount = 50;
+
+        // 核心修改：建立分类名称到图片前缀的映射表
+        const categoryToPrefixMap = {
+            '注册登录': 'class1',
+            '编辑检索': 'class2', // 可根据需求添加其他分类的映射
+            '属性设置': 'class3',
+            '应用功能': 'class4',
+            '导航': 'class5'
+        };
 
         // 返回首页函数
         function goToHome() {
@@ -832,7 +824,6 @@
                 return;
             }
 
-            // 显示最近3条撤销记录
             const recentHistory = annotationHistory.slice(-3).reverse();
             let html = '';
             recentHistory.forEach((item, index) => {
@@ -850,30 +841,23 @@
         // 撤销上次标注（优化版）
         function undoLastAnnotation() {
             if (collectedData.length === 0) {
-                // 撤销失败提示
                 showFeedback('❌ 没有可撤销的标注', 'error');
-                // 按钮抖动动画
                 const undoBtn = document.getElementById('undoBtn');
                 undoBtn.classList.add('undo-animation');
                 setTimeout(() => undoBtn.classList.remove('undo-animation'), 500);
                 return;
             }
 
-            // 保存撤销的标注到历史记录
             const undoneItem = collectedData.pop();
             annotationHistory.push(undoneItem);
 
-            // 撤销成功提示（自定义颜色）
             showFeedback(`✅ 已撤销：${undoneItem.action}（${formatTime(undoneItem.startTime)}）`, 'undo');
             
-            // 更新界面状态
             updateUndoButtonState();
             updateAnnotationCount();
             updateUndoHistory();
             
-            // 文本框提示
             updateTextBox(`${currentImageIndex + 1}/${totalImageCount} - 已撤销${undoneItem.action}`);
-            // 2秒后恢复原文本
             setTimeout(() => {
                 updateTextBox(`${currentImageIndex + 1}/${totalImageCount} - 交互类型`);
             }, 2000);
@@ -884,7 +868,6 @@
             const undoBtn = document.getElementById('undoBtn');
             undoBtn.disabled = collectedData.length === 0;
             
-            // 禁用/启用状态的文本变化
             if (collectedData.length === 0) {
                 undoBtn.innerHTML = '<i class="fas fa-undo-alt"></i><span>无标注可撤销</span>';
             } else {
@@ -913,10 +896,8 @@
                 <span>${message}</span>
             `;
             
-            // 移除所有类型类
             toast.classList.remove('success', 'error', 'undo', 'show');
             
-            // 添加对应类型类
             if (type === 'error') {
                 toast.classList.add('error');
             } else if (type === 'undo') {
@@ -925,10 +906,8 @@
                 toast.classList.add('success');
             }
             
-            // 显示提示
             toast.classList.add('show');
             
-            // 3秒后隐藏
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -946,7 +925,7 @@
             currentRetryCount = 0;
 
             const taskImage = document.getElementById('taskImage');
-            const imageUrl = imageUrls[index]; // 直接使用原始图片链接
+            const imageUrl = imageUrls[index];
             const imageName = imageUrl.split('/').pop();
             const imageCacheKey = `uiTest_${classPrefix}_${imageName}`;
             const cachedUrl = localStorage.getItem(imageCacheKey);
@@ -961,13 +940,12 @@
 
             // 超时设置（10秒）
             const timeoutTimer = setTimeout(() => {
-                // 手动触发错误，传入明确的错误信息
                 taskImage.onerror({ message: 'Timeout' });
             }, 10000);
 
             // 加载成功回调
             taskImage.onload = function() {
-                clearTimeout(timeoutTimer); // 清除超时定时器
+                clearTimeout(timeoutTimer);
                 if (taskImage.complete) {
                     document.getElementById('loadingOverlay').style.display = 'none';
                     const timestamp = new Date().getTime();
@@ -990,15 +968,12 @@
 
             // 优化错误处理：修复undefined错误，区分错误类型，新增手动重试
             taskImage.onerror = function(e) {
-                clearTimeout(timeoutTimer); // 清除超时定时器
+                clearTimeout(timeoutTimer);
                 currentRetryCount++;
                 document.getElementById('imageError').style.display = 'flex';
                 
-                // 安全获取错误信息，避免undefined
                 const errorMsg = e?.message || 'Unknown error';
-                // 检测连接错误（安全访问，避免includes报错）
                 const isConnectionError = errorMsg.includes('ERR_CONNECTION_RESET') || errorMsg.includes('net::ERR_') || errorMsg.includes('403');
-                // 连接错误：重试5次，间隔2秒；普通错误/超时：重试3次，间隔1秒
                 const maxRetry = isConnectionError ? 5 : 3;
                 const retryDelay = isConnectionError ? 2000 : 1000;
                 
@@ -1009,14 +984,12 @@
                         `图片加载失败，正在重试（${currentRetryCount}/${maxRetry}）`;
                     showFeedback(feedbackMsg, 'error');
                     
-                    // 重试时直接使用原始链接，无额外参数
                     setTimeout(() => {
                         taskImage.src = imageUrl;
                     }, retryDelay);
                 } else {
                     document.getElementById('loadingOverlay').style.display = 'none';
                     document.getElementById('imageError').innerHTML = '<i class="fas fa-exclamation-triangle"></i> 图片加载失败，点击此处重试';
-                    // 允许用户手动刷新当前图片
                     document.getElementById('imageError').onclick = function() {
                         currentRetryCount = 0;
                         loadImage(index);
@@ -1032,14 +1005,13 @@
         // 预加载下一张图片：直接使用原始链接
         function preloadNextImage(index) {
             if (index < imageUrls.length) {
-                nextImage.src = imageUrls[index]; // 原始链接，无额外参数
+                nextImage.src = imageUrls[index];
             }
         }
 
         // 生成指定范围的不重复随机数
         function getUniqueRandomNumbers(min, max, count) {
             const numbers = new Set();
-            // 确保count不超过范围总数
             const maxPossible = Math.min(count, max - min + 1);
             while (numbers.size < maxPossible) {
                 const num = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -1051,22 +1023,18 @@
         // 构建图片URL列表：直接使用原始链接，移除CORS代理
         function buildImageUrls() {
             imageUrls = [];
-            // 生成不重复的随机数
             const randomNumbers = getUniqueRandomNumbers(randomMin, randomMax, imageCount);
-            // 拼接原始图片URL
+            // 使用映射后的前缀拼接URL
             randomNumbers.forEach(num => {
                 const imageUrl = `${baseImageUrl}/${classPrefix}_${num}.jpg`;
                 imageUrls.push(imageUrl);
             });
-            // 更新总图片数
             totalImageCount = imageUrls.length;
-            // 更新图片数量显示文本
             document.getElementById('imageCountText').textContent = `共${totalImageCount}张UI截图，请完成所有标注`;
-            // 初始化文本框显示
             document.getElementById('operationType').value = `1/${totalImageCount} - 交互类型`;
             // 打乱顺序（可选）
             imageUrls = shuffleArray(imageUrls);
-            console.log(`已生成${imageUrls.length}张图片URL（随机范围：${randomMin}-${randomMax}）`);
+            console.log(`已生成${imageUrls.length}张图片URL（随机范围：${randomMin}-${randomMax}，前缀：${classPrefix}）`);
             loadImage(currentImageIndex);
         }
 
@@ -1106,7 +1074,6 @@
             console.log('记录交互：', data);
             showFeedback(`已记录：${actionType}`);
             
-            // 更新统计和按钮状态
             updateUndoButtonState();
             updateAnnotationCount();
             updateUndoHistory();
@@ -1150,7 +1117,6 @@
             // 鼠标按下
             taskImage.addEventListener('mousedown', function(e) {
                 if (!trackingStarted) return;
-                // 获取鼠标在图片内的坐标
                 const rect = taskImage.getBoundingClientRect();
                 startCoords = {
                     x: e.clientX - rect.left,
@@ -1282,15 +1248,16 @@
             const params = new URLSearchParams(window.location.search);
             currentCategory = params.get('category') || '未知分类';
             currentGroup = params.get('group') || '未知分组';
-            classPrefix = params.get('classPrefix') || params.get('category') || 'class1'; // 兼容旧参数
-            baseImageUrl = params.get('baseUrl') || 'https://class1-7sbns0vg.maozi.io/src'; // 原始图片基础路径
+            // 核心修改：从映射表获取前缀，兼容classPrefix参数，默认值为class1
+            classPrefix = params.get('classPrefix') || categoryToPrefixMap[currentCategory] || 'class1';
+            baseImageUrl = params.get('baseUrl') || 'https://class1-7sbns0vg.maozi.io/src';
             randomMin = parseInt(params.get('randomMin')) || 1;
             randomMax = parseInt(params.get('randomMax')) || 1200;
             imageCount = parseInt(params.get('imageCount')) || 50;
 
             // 显示分类和分组信息
             document.getElementById('currentCategory').textContent = `当前分类：${currentCategory}`;
-            document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（随机范围：${randomMin}-${randomMax}）`;
+            document.getElementById('currentGroup').textContent = `当前分组：${currentGroup}（随机范围：${randomMin}-${randomMax}，前缀：${classPrefix}）`;
 
             // 初始化界面状态
             updateUndoButtonState();
