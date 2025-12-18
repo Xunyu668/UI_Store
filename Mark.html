@@ -114,7 +114,7 @@
         let imageUrls = []; // 图片URL列表
         let currentImageIndex = 0; // 当前显示的图片索引
         let baseImageUrl = ''; // 图片基础路径
-        let classPrefix = ''; // ID前缀（class）
+        let classPrefix = ''; // ID前缀（class1）
 
         // 页面加载时初始化
         window.onload = function() {
@@ -124,11 +124,11 @@
         // 初始化页面：获取URL参数并生成图片URL
         function initPage() {
             const params = new URLSearchParams(window.location.search);
-            baseImageUrl = params.get('baseUrl') || 'src/class1';
-            classPrefix = params.get('classPrefix') || 'class';
+            baseImageUrl = params.get('baseUrl') || 'https://class1-7sbns0vg.maozi.io/src';
+            classPrefix = params.get('classPrefix') || 'class1';
             const idList = params.get('ids')?.split(',').map(Number) || []; // 获取随机ID列表
 
-            // 生成图片URL（class_1.jpg、class_2.jpg...）
+            // 生成图片URL（class1_1.jpg、class1_2.jpg...）
             buildImageUrls(idList);
             // 加载第一张图片
             loadImage(currentImageIndex);
@@ -142,8 +142,9 @@
                 return;
             }
 
-            // 遍历ID列表，生成对应的图片URL
+            // 遍历ID列表，生成对应的图片URL（适配远程/本地路径）
             idList.forEach(id => {
+                // 拼接路径：基础路径 + / + 前缀_数字.jpg
                 const imageUrl = `${baseImageUrl}/${classPrefix}_${id}.jpg`;
                 imageUrls.push(imageUrl);
             });
