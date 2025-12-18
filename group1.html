@@ -80,12 +80,9 @@
         .back-btn:hover {
             background-color: #5a6268;
         }
-        /* 引入字体图标 */
-        link {
-            rel: stylesheet;
-            href: "https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css";
-        }
     </style>
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -99,29 +96,43 @@
         // 从URL获取分类信息（默认class1）
         const params = new URLSearchParams(window.location.search);
         const categoryName = params.get('category') || 'class1';
-        const baseUrl = `src/${categoryName}`;
-        const classPrefix = 'class'; // 对应class_1到class_2362的前缀
+        const classPrefix = 'class1'; // 对应class1_1到class1_1200的前缀
 
         // 显示当前分类名称
         document.getElementById('categoryName').textContent = `当前分类: ${categoryName}`;
 
-        // 配置参数：2个分组，每组50个，总ID范围1-2362
+        // 核心配置参数
         const groupCount = 2; // 分组数量
         const imagesPerGroup = 50; // 每组数量
-        const totalImageIds = 2362; // ID最大值（class_1到class_2362）
-
-        // 生成1到2362的所有ID数组
-        const allIds = Array.from({ length: totalImageIds }, (_, i) => i + 1);
-        // 随机打乱数组（洗牌算法）
-        const shuffledIds = shuffleArray([...allIds]);
+        // 分组1：ID范围1-1200，路径为固定的远程地址
+        const group1Config = {
+            minId: 1,
+            maxId: 1200,
+            baseUrl: 'https://class1-7sbns0vg.maozi.io/src' // 分组1的图片基础路径
+        };
+        // 分组2：可自定义（这里保留原逻辑，ID范围1-2362，路径为本地src/class1）
+        const group2Config = {
+            minId: 1,
+            maxId: 2362,
+            baseUrl: `src/${categoryName}` // 分组2的图片基础路径
+        };
 
         // 生成分组按钮
         const groupContainer = document.getElementById('groupContainer');
         for (let i = 1; i <= groupCount; i++) {
-            // 截取对应分组的ID（确保不重复）
-            const startIdx = (i - 1) * imagesPerGroup;
-            const endIdx = startIdx + imagesPerGroup;
-            const groupIds = shuffledIds.slice(startIdx, endIdx);
+            // 根据分组编号获取对应配置
+            let config, groupIds;
+            if (i === 1) {
+                // 分组1：从1-1200中随机生成50个不重复ID
+                config = group1Config;
+                const allIds = Array.from({ length: config.maxId - config.minId + 1 }, (_, idx) => config.minId + idx);
+                groupIds = shuffleArray([...allIds]).slice(0, imagesPerGroup);
+            } else {
+                // 分组2：从1-2362中随机生成50个不重复ID（可自行修改配置）
+                config = group2Config;
+                const allIds = Array.from({ length: config.maxId - config.minId + 1 }, (_, idx) => config.minId + idx);
+                groupIds = shuffleArray([...allIds]).slice(0, imagesPerGroup);
+            }
 
             // 创建分组按钮
             const button = document.createElement('button');
@@ -133,9 +144,9 @@
             `;
 
             // 按钮点击事件：跳转到标注页面并传递参数
-            const idList = groupIds.join(','); // 将ID数组转为字符串传递
+            const idList = groupIds.join(',');
             button.onclick = () => {
-                goToMarkPage(baseUrl, categoryName, i, idList, classPrefix);
+                goToMarkPage(config.baseUrl, categoryName, i, idList, classPrefix);
             };
 
             groupContainer.appendChild(button);
@@ -158,7 +169,7 @@
             searchParams.append('category', category);
             searchParams.append('group', groupId);
             searchParams.append('ids', idList); // 传递随机ID列表
-            searchParams.append('classPrefix', classPrefix); // 传递ID前缀（class）
+            searchParams.append('classPrefix', classPrefix); // 传递ID前缀（class1）
             window.location.href = `Mark.html?${searchParams.toString()}`;
         }
 
