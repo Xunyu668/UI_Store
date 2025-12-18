@@ -7,7 +7,6 @@
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 保留所有原有样式，此处省略（样式无修改） */
         * {
             margin: 0;
             padding: 0;
@@ -778,17 +777,17 @@
         const slideThresholdRatio = 0.04;
         let currentCategory = '';
         let currentGroup = '';
-        let classPrefix = ''; // 不再强制设置，通过映射表获取
+        let classPrefix = ''; // 映射后的前缀
         let baseImageUrl = '';
         let randomMin = 1;
         let randomMax = 1200;
         let imageCount = 50;
         let totalImageCount = 50;
 
-        // 核心修改：建立分类名称到图片前缀的映射表
+        // 核心：分类名称到图片前缀的映射表（确保键与传入的category参数完全一致，无空格）
         const categoryToPrefixMap = {
             '注册登录': 'class1',
-            '编辑检索': 'class2', // 可根据需求添加其他分类的映射
+            '编辑检索': 'class2',
             '属性设置': 'class3',
             '应用功能': 'class4',
             '导航': 'class5'
@@ -1020,12 +1019,13 @@
             return Array.from(numbers);
         }
 
-        // 构建图片URL列表：直接使用原始链接，移除CORS代理
+        // 构建图片URL的函数——彻底移除currentCategory，只使用classPrefix
         function buildImageUrls() {
             imageUrls = [];
             const randomNumbers = getUniqueRandomNumbers(randomMin, randomMax, imageCount);
-            // 使用映射后的前缀拼接URL
+            // 关键：拼接时使用classPrefix，不再使用currentCategory
             randomNumbers.forEach(num => {
+                // 正确格式：baseUrl/classPrefix_数字.jpg
                 const imageUrl = `${baseImageUrl}/${classPrefix}_${num}.jpg`;
                 imageUrls.push(imageUrl);
             });
@@ -1034,7 +1034,7 @@
             document.getElementById('operationType').value = `1/${totalImageCount} - 交互类型`;
             // 打乱顺序（可选）
             imageUrls = shuffleArray(imageUrls);
-            console.log(`已生成${imageUrls.length}张图片URL（随机范围：${randomMin}-${randomMax}，前缀：${classPrefix}）`);
+            console.log(`已生成${imageUrls.length}张图片URL（前缀：${classPrefix}，随机范围：${randomMin}-${randomMax}）`);
             loadImage(currentImageIndex);
         }
 
@@ -1244,12 +1244,18 @@
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取URL参数（适配新的参数名）
+            // 获取URL参数
             const params = new URLSearchParams(window.location.search);
-            currentCategory = params.get('category') || '未知分类';
+            // 去除category参数的首尾空格，避免匹配失败
+            currentCategory = params.get('category')?.trim() || '未知分类';
             currentGroup = params.get('group') || '未知分组';
-            // 核心修改：从映射表获取前缀，兼容classPrefix参数，默认值为class1
-            classPrefix = params.get('classPrefix') || categoryToPrefixMap[currentCategory] || 'class1';
+            // 调整优先级：先从映射表获取，再从URL的classPrefix参数获取，最后用默认值
+            // （这样即使URL传入了classPrefix，也会被映射表覆盖，确保分类和前缀严格对应）
+            classPrefix = categoryToPrefixMap[currentCategory] || params.get('classPrefix') || 'class1';
+            // 若映射表中没有匹配的分类，给出提示
+            if (!categoryToPrefixMap[currentCategory] && currentCategory !== '未知分类') {
+                console.warn(`分类「${currentCategory}」未在映射表中配置，使用备用前缀：${classPrefix}`);
+            }
             baseImageUrl = params.get('baseUrl') || 'https://class1-7sbns0vg.maozi.io/src';
             randomMin = parseInt(params.get('randomMin')) || 1;
             randomMax = parseInt(params.get('randomMax')) || 1200;
