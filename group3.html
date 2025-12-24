@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择测试分组 - Group 3</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --danger-color: #f72585;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --radius-lg: 20px;
+            --transition-normal: 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .decor-element {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.08);
+            z-index: -1;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        .decor-1 { width: 250px; height: 250px; top: 15%; left: 10%; }
+        .decor-2 { width: 300px; height: 300px; bottom: 15%; right: 10%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%,100% { transform: translate(0,0); }
+            50% { transform: translate(15px,-25px); }
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .category-name {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding: 10px 25px;
+            background: rgba(67,97,238,0.1);
+            border-radius: var(--radius-lg);
+            display: inline-block;
+            box-shadow: var(--shadow-sm);
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .subtitle-note {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .group-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .group-btn {
+            padding: 28px 15px;
+            background: var(--bg-white);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .group-btn i {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .group-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .group-count {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            font-weight: normal;
+        }
+
+        .back-btn {
+            padding: 12px 30px;
+            background: linear-gradient(90deg, var(--danger-color), #e53e3e);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(247,37,133,0.2);
+            transition: var(--transition-normal);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(247,37,133,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="decor-element decor-1"></div>
+<div class="decor-element decor-2"></div>
+
+<div class="header-container">
+    <h1>选择测试分组</h1>
+    <div class="category-name">属性设置</div>
+    <p class="subtitle">本分组包含 50 张图片，请开始标注：</p>
+    <p class="subtitle-note">提示：完成后可以返回继续选择其他分组</p>
+</div>
+
+<div class="group-container" id="groupContainer"></div>
+
+<button class="back-btn" onclick="goBack()">
+    <i class="fas fa-arrow-left"></i>
+    返回分类选择
+</button>
+
+<script>
+    const categoryName = '属性设置';
+    const group = {
+        baseUrl: 'https://class3-3gey50vg.maozi.io/src',
+        randomMin: 1,
+        randomMax: 700,
+        className: 'class3'
+    };
+    const imageCount = 50;
+    const container = document.getElementById('groupContainer');
+
+    // 生成唯一的按钮进入 Mark 页面
+    const btn = document.createElement('button');
+    btn.className = 'group-btn';
+    btn.innerHTML = `
+        <i class="fas fa-images"></i>
+        <span>分组 1</span>
+        <span class="group-count">
+            共50张图片（${group.randomMin}-${group.randomMax} 随机）
+        </span>
+    `;
+    btn.onclick = () => goToMarkPage(
+        group.baseUrl,
+        categoryName,
+        3,
+        group.randomMin,
+        group.randomMax,
+        imageCount,
+        group.className
+    );
+    container.appendChild(btn);
+
+    function goToMarkPage(baseUrl, category, groupId, randomMin, randomMax, imageCount, className) {
+        const params = new URLSearchParams({
+            baseUrl,
+            category,
+            group: groupId,
+            randomMin,
+            randomMax,
+            imageCount,
+            class: className
+        });
+        window.location.href = `Mark.html?${params.toString()}`;
+    }
+
+    function goBack() {
+        window.location.href = 'home.html';
+    }
+</script>
+
+</body>
+</html>
