@@ -977,7 +977,10 @@
                     const originalHeight = taskImage.naturalHeight;
 
                     recordTaskStartData(timestamp, displayedWidth, displayedHeight, originalWidth, originalHeight);
-                    preloadNextImage(index + 1);
+                    // 修复：最后一张图片不预加载，避免404
+                    if (index + 1 < imageUrls.length) {
+                        preloadNextImage(index + 1);
+                    }
                     showFeedback('图片加载完成，可开始交互');
                     
                     annotationHistory = [];
@@ -1247,7 +1250,7 @@
             const taskImage = document.getElementById('taskImage');
             const imageName = taskImage.src.split('/').pop();
             allResults.push({
-                imageIndex: currentImageIndex + 1,
+                imageIndex: currentImageIndex, // 不加 +1
                 imageName: imageName,
                 taskType: currentCategory,
                 taskData: [...collectedData],
@@ -1269,13 +1272,15 @@
                 loadImage(currentImageIndex);
                 setTimeout(window.startTracking, 500);
             } else {
+                // 最后一张图片处理：自动下载并跳转到首页
                 downloadResults(allResults);
-                showFeedback('当前分组测试完成，即将返回分组选择页');
+                showFeedback('当前分组测试完成，即将返回首页');
                 setTimeout(() => {
-                    window.location.href = `category.html?category=${currentCategory}`;
+                    window.location.href = 'home.html'; // 跳转到同级的home.html
                 }, 2000);
             }
         }
+
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', function() {
